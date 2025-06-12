@@ -1,27 +1,31 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Разрешаем CORS — важно при раздельных доменах
+// Включаем CORS, чтобы разрешить запросы с других доменов
 app.use(cors());
 
-// Разбор JSON и form-urlencoded
+// Парсим JSON и form-urlencoded
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// (Если вдруг будешь добавлять HTML прямо в этот проект)
-// app.use(express.static(path.join(__dirname, 'public')));
+// Обработчик GET-запроса на корень, чтобы не было ошибки "Cannot GET /"
+app.get('/', (req, res) => {
+  res.send(`
+    <h1>Сервер работает!</h1>
+    <p>Для отправки данных используйте POST запрос на /submit</p>
+  `);
+});
 
-// Обработка POST-запроса
+// Обработка POST-запроса /submit
 app.post('/submit', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).send('Имя пользователя и пароль обязательны.');
+    return res.status(400).send('Ошибка: имя пользователя и пароль обязательны.');
   }
 
   res.send(`
@@ -86,5 +90,5 @@ function sanitize(str) {
 }
 
 app.listen(port, () => {
-  console.log(`✅ Сервер запущен: http://localhost:${port}`);
+  console.log(`Сервер запущен на http://localhost:${port}`);
 });
